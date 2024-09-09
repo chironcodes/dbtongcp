@@ -10,10 +10,11 @@ Creating a service account that will work with dbt core
 export GOOGLE_CLOUD_PROJECT=your_project
 
 gcloud iam service-accounts create dbt-core-runner \
-    --display-name="Dbt Job Runner"
+    --display-name="Dbt Job Runner" \
+    --project $GOOGLE_CLOUD_PROJECT
 
 
-DBTCORE_SERVICE_ACCOUNT=dbt-core-runner@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
+DBT_CORE_SERVICE_ACCOUNT=dbt-core-runner@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 
 ```
 
@@ -24,11 +25,12 @@ DBTCORE_SERVICE_ACCOUNT=dbt-core-runner@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccoun
 ```sh
 
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
-    --member serviceAccount:$DBTCORE_SERVICE_ACCOUNT \
+    --member serviceAccount:$DBT_CORE_SERVICE_ACCOUNT \
+    --project $GOOGLE_CLOUD_PROJECT \
     --role roles/bigquery.dataEditor \
     --role roles/bigquery.jobUser \
     --role roles/iam.serviceAccountUser \
-    --role roles/iam.serviceAccountTokenCreator \
+    --role roles/iam.serviceAccountTokenCreator
     
 ```
 
@@ -37,7 +39,7 @@ gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
 ```sh
 
 gcloud iam service-accounts keys create secrets/dbt-core-job-runner.json \
-    --iam-account $MAGEAI_SERVICE_ACCOUNT
+    --iam-account $DBT_CORE_SERVICE_ACCOUNT
 
 tr -d '\n' < secrets/dbt-core-job-runner.json > secrets/dbt-core-job-runner-oneline.json
 
